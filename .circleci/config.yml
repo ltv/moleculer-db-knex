@@ -1,0 +1,51 @@
+# https://circleci.com/docs/2.0/language-javascript/
+version: 2
+
+jobs:
+  'node-10':
+    machine: true
+    working_directory: ~/moleculer-db-knex
+    steps:
+      - run:
+          name: Enable nvm
+          command: |
+            echo "export NVM_DIR=/opt/circleci/.nvm" >> $BASH_ENV
+            echo "source $NVM_DIR/nvm.sh" >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Install Node & Yarn
+          command: |
+            nvm install v10.15.3
+            nvm alias default v10.15.3
+            node -v
+            npm i -g yarn
+            yarn --version
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run: docker pull postgres:10.5
+      - run: git clone https://github.com/vishnubob/wait-for-it.git
+      - run: chmod +x ./wait-for-it/wait-for-it.sh
+      - run:
+          name: Start container and verify it is working
+          command: yarn provision:dev
+      - run:
+          name: Waiting for postgres running
+          command: ./wait-for-it/wait-for-it.sh -t 120 localhost:5434
+      - run: yarn test:lint
+      - run: yarn test:unit --coverageReporters=text-lcov | npx coveralls
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - 'node-10'

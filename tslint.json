@@ -1,0 +1,11 @@
+{
+  "extends": ["tslint:latest", "tslint-config-prettier", "tslint-immutable"],
+  "rules": {
+    "interface-name": [true, "never-prefix"],
+    "no-implicit-dependencies": false,
+    "object-literal-sort-keys": false
+  },
+  "linterOptions": {
+    "exclude": ["node_modules/**", "src/**/__tests__/**"]
+  }
+}
