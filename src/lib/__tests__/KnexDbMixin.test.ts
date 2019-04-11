@@ -155,13 +155,11 @@ describe('>> KnexDBMixin <<', () => {
     });
 
     it('Should find correct post by id', async () => {
-      expect.assertions(2);
       const foundPosts = await broker.call('public.findById', {
         id: createdPosts[0].id
       });
 
-      expect(foundPosts.length).toEqual(1);
-      expect(foundPosts[0]).toMatchObject(createdPosts[0]);
+      expect(foundPosts).toMatchObject(createdPosts[0]);
     });
 
     it('Should find correct post with custom operator', async () => {
@@ -268,7 +266,7 @@ describe('>> KnexDBMixin with Cacher <<', () => {
     });
 
     it('Should find correct post by id', async () => {
-      expect.assertions(3);
+      expect.assertions(2);
       const foundPosts = await broker.call('public.findById', {
         id: createdPosts[0].id
       });
@@ -276,8 +274,7 @@ describe('>> KnexDBMixin with Cacher <<', () => {
         key: `public.findById:${createdPosts[0].id}`
       });
 
-      expect(foundPosts.length).toEqual(1);
-      expect(foundPosts[0]).toMatchObject(createdPosts[0]);
+      expect(foundPosts).toMatchObject(createdPosts[0]);
       expect(fromCached).toMatchObject(foundPosts);
     });
 

@@ -69,7 +69,7 @@ export function KnexDbMixin(
           return this.find({
             field: this.settings.idField,
             value: ctx.params[this.settings.idField]
-          });
+          }).then(res => res && res[0]);
         }
       },
 
@@ -170,8 +170,8 @@ export function KnexDbMixin(
         return !opts
           ? this.db().select('*')
           : this.db()
-              .where(opts.field, opts.operator || '=', opts.value)
-              .select('*');
+            .where(opts.field, opts.operator || '=', opts.value)
+            .select('*');
       },
 
       insert(entity: any, returning?: string | string[]) {
