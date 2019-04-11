@@ -33,7 +33,7 @@ const configs: Config = {
 broker.createService({
   name: 'public',
   mixins: [
-    MoleculerKnexDbMixin({
+    KnexDbMixin({
       schema: 'adm',
       table: 'PubPost',
       knex: {

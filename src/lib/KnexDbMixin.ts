@@ -19,7 +19,7 @@ const defaultOptions: MoleculerKnexDbOptions = {
   knex: null
 };
 
-export function MoleculerKnexDbMixin(
+export function KnexDbMixin(
   options: MoleculerKnexDbOptions
 ): ServiceSchema {
   const opts: MoleculerKnexDbOptions = { ...defaultOptions, ...options };

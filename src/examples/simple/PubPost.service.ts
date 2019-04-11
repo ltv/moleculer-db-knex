@@ -1,10 +1,10 @@
 import { Service } from '@ltv/moleculer-decorators';
-import { MoleculerKnexDbMixin } from '../../lib/KnexDbMixin';
+import { KnexDbMixin } from '../../lib/KnexDbMixin';
 
 @Service({
   name: 'PubPost',
   mixins: [
-    MoleculerKnexDbMixin({
+    KnexDbMixin({
       schema: 'adm',
       table: 'PubPost',
       knex: {

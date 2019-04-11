@@ -1,4 +1,4 @@
-import { MoleculerKnexDbMixin } from '../KnexDbMixin';
+import { KnexDbMixin } from '../KnexDbMixin';
 import { ServiceBroker, Context } from 'moleculer';
 import { Config, ConnectionConfig } from 'knex';
 
@@ -30,7 +30,7 @@ describe('>> KnexDBMixin <<', () => {
   const service = broker.createService({
     name: 'public',
     mixins: [
-      MoleculerKnexDbMixin({
+      KnexDbMixin({
         schema: 'public',
         table: 'PubPost',
         idField: 'id',
@@ -202,7 +202,7 @@ describe('>> KnexDBMixin with Cacher <<', () => {
   const service = broker.createService({
     name: 'public',
     mixins: [
-      MoleculerKnexDbMixin({
+      KnexDbMixin({
         schema: 'public',
         table: 'PubPost',
         idField: 'id',

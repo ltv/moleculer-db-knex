@@ -1,7 +1,7 @@
-import { MoleculerKnexDbMixin } from '../index';
+import { KnexDbMixin } from '../index';
 
 describe(`>> index <<`, () => {
-  it('Should export MoleculerKnexDbMixin', () => {
-    expect(MoleculerKnexDbMixin).toBeInstanceOf(Function);
+  it('Should export KnexDbMixin', () => {
+    expect(KnexDbMixin).toBeInstanceOf(Function);
   });
 });
