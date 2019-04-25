@@ -161,9 +161,13 @@ export function KnexDbMixin(
         return Knex(opts.knex.configs);
       },
 
+      knex() {
+        return knex;
+      },
+
       db(options?: { schema?: string; table: string }): QueryBuilder {
         const { schema = 'public', table } = options || { ...opts };
-        return knex(table).withSchema(schema);
+        return this.knex()(table).withSchema(schema);
       },
 
       find(opts?: { field: string; value: any; operator: string }) {
