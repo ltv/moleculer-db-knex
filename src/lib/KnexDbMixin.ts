@@ -161,7 +161,7 @@ export function KnexDbMixin(
         return Knex(opts.knex.configs);
       },
 
-      knex() {
+      knex(): Knex {
         return knex;
       },
 
@@ -170,7 +170,7 @@ export function KnexDbMixin(
         return this.knex()(table).withSchema(schema);
       },
 
-      find(opts?: { field: string; value: any; operator: string }) {
+      find<T = any>(opts?: { field: string; value: any; operator: string }): T {
         return !opts
           ? this.db().select('*')
           : this.db()
@@ -178,36 +178,36 @@ export function KnexDbMixin(
             .select('*');
       },
 
-      insert(entity: any, returning?: string | string[]) {
+      insert<T = any>(entity: any, returning?: string | string[]): T {
         return this.db()
           .insert(entity, returning || '*')
           .then(res => res && res[0]);
       },
 
-      update(opts: {
+      update<T = any>(opts: {
         field: string;
         value: any;
         entity: any;
         returning?: string | string[];
-      }) {
+      }): T {
         return this.db()
           .where(opts.field, opts.value)
           .update(opts.entity, opts.returning || '*')
           .then(res => res && res[0]);
       },
 
-      delete(opts: {
+      delete<T = any>(opts: {
         field: string;
         value: any;
         returning?: string | string[];
-      }) {
+      }): T {
         return this.db()
           .where(opts.field, opts.value)
           .del(opts.returning || '*')
           .then(res => res && res[0]);
       },
 
-      clean() {
+      clean(): void {
         return this.db()
           .whereNotNull(this.settings.idField)
           .del();
