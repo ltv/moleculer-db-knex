@@ -8,7 +8,8 @@ export interface MoleculerKnexDbOptions {
   table: string; // table name
   idField?: string;
   knex: {
-    configs: Config;
+    configs?: Config;
+    instance?: Knex
   };
 }
 
@@ -158,7 +159,10 @@ export function KnexDbMixin(
       },
 
       connect() {
-        return Knex(opts.knex.configs);
+        if (!opts.knex.instance) {
+          opts.knex.instance = Knex(opts.knex.configs);
+        }
+        return opts.knex.instance;
       },
 
       knex(): Knex {
