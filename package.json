@@ -58,7 +58,7 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "knex": "^0.17.3",
+    "knex": "^0.19.5",
     "lodash.capitalize": "^4.2.1"
   },
   "devDependencies": {
