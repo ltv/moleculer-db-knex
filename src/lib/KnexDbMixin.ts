@@ -7,6 +7,7 @@ export interface MoleculerKnexDbOptions {
   schema: string; // database schema
   table: string; // table name
   idField?: string;
+  tenantField?: string;
   knex: {
     configs?: Config;
     instance?: Knex
@@ -17,6 +18,7 @@ const defaultOptions: MoleculerKnexDbOptions = {
   schema: 'public',
   table: '',
   idField: 'id',
+  tenantField: 'tenantId',
   knex: null
 };
 
@@ -25,35 +27,25 @@ export function KnexDbMixin(
 ): ServiceSchema {
   const opts: MoleculerKnexDbOptions = { ...defaultOptions, ...options };
   let knex: Knex;
-  const { idField } = opts;
+  const { idField, tenantField } = opts;
 
   const schema: ServiceSchema = {
     name: '',
-    settings: { idField },
+    settings: { idField, tenantField },
     actions: {
       find: {
         params: {
-          field: {
-            type: 'string',
-            optional: true
-          },
-          value: {
-            type: 'any',
-            optional: true
-          },
-          operator: {
-            type: 'string',
+          where: {
+            type: 'object',
             optional: true
           }
         },
         cache: {
-          keys: ['field', 'value', 'operator']
+          keys: ['where']
         },
         handler(ctx: Context) {
-          const { field, value, operator = '=' } = ctx.params;
-          return this.find(
-            !field || !value ? undefined : { field, value, operator }
-          );
+          const { where = {} } = ctx.params;
+          return this.find(where);
         }
       },
 
@@ -66,11 +58,14 @@ export function KnexDbMixin(
         cache: {
           keys: [idField]
         },
-        handler(ctx: Context) {
-          return this.find({
-            field: this.settings.idField,
-            value: ctx.params[this.settings.idField]
-          }).then(res => res && res[0]);
+        async handler(ctx: Context) {
+          try {
+            const res = await this.find({ [this.settings.idField]: ctx.params[this.settings.idField] });
+            return res && res.length ? res[0] : null;
+          } catch (e) {
+            this.logger.error(e);
+            return null;
+          }
         }
       },
 
@@ -169,17 +164,32 @@ export function KnexDbMixin(
         return knex;
       },
 
-      db(options?: { schema?: string; table: string }): QueryBuilder {
-        const { schema = 'public', table } = options || { ...opts };
-        return this.knex()(table).withSchema(schema);
+      db(options?: { schema?: string; table: string, tenant?: number | string }): QueryBuilder {
+        const { schema = 'public', table, tenant = null } = options || { ...opts };
+        const db = this.knex()(table).withSchema(schema);
+
+        // Check if configured tenant, will be use the tenant
+        if (tenant && this.settings.tenantField) {
+          return db.where(this.settings.tenantField, '=', tenant);
+        }
+
+        // return knex db builder
+        return db;
       },
 
-      find<T = any>(opts?: { field: string; value: any; operator: string }): T {
-        return !opts
-          ? this.db().select('*')
-          : this.db()
-            .where(opts.field, opts.operator || '=', opts.value)
-            .select('*');
+      find<T = any[]>(where?: { [key: string]: number | boolean | string }): T {
+        where = where || {};
+        const keys = Object.keys(where);
+
+        const db = this.db();
+
+        if (keys.length > 0) {
+          keys.forEach((k: string) => {
+            db.where(k, where[k]);
+          });
+        }
+
+        return db.select('*');
       },
 
       insert<T = any>(entity: any, returning?: string | string[]): T {
