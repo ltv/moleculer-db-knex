@@ -1,6 +1,6 @@
 {
   "name": "moleculer-db-knex",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Moleculer DB Knex",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -58,7 +58,7 @@
     "node": ">=8.9"
   },
   "dependencies": {
-    "knex": "^0.17.3",
+    "knex": "^0.20.13",
     "lodash.capitalize": "^4.2.1"
   },
   "devDependencies": {
@@ -72,7 +72,7 @@
     "ioredis": "^4.9.0",
     "jest": "^24.5.0",
     "jest-config": "^24.5.0",
-    "moleculer": "^0.13.8",
+    "moleculer": "^0.14.5",
     "moleculer-repl": "^0.5.7",
     "npm-run-all": "^4.1.5",
     "opn-cli": "^4.0.0",
