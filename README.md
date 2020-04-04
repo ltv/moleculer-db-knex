@@ -49,21 +49,13 @@ broker.createService({
 ```js
 find: {
         params: {
-          field: {
-            type: 'string',
-            optional: true
-          },
-          value: {
-            type: 'any',
-            optional: true
-          },
-          operator: {
-            type: 'string',
+          where: {
+            type: 'object',
             optional: true
           }
         },
         cache: {
-          keys: ['field', 'value', 'operator']
+          keys: ['where']
         },
         handler(ctx: Context) {
         }
@@ -179,3 +171,4 @@ And then
 ```bash
 yarn test:unit
 ```
+````

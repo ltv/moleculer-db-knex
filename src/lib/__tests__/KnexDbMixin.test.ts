@@ -85,7 +85,7 @@ describe('>> KnexDBMixin <<', () => {
 
   it('Should create PubPost', async () => {
     expect.assertions(2);
-    const post = await broker.call('public.insert', {
+    const post: any = await broker.call('public.insert', {
       entity: postData
     });
     insertedPost = { ...post };
@@ -103,7 +103,7 @@ describe('>> KnexDBMixin <<', () => {
   it('Should update PubPost correctly', async () => {
     expect.assertions(2);
     const tobeUpdated = { title: 'New Title', content: 'New Content' };
-    const updated = await broker.call('public.updateById', {
+    const updated: any = await broker.call('public.updateById', {
       id: insertedPost.id,
       entity: tobeUpdated
     });
@@ -117,7 +117,7 @@ describe('>> KnexDBMixin <<', () => {
 
   it('Should delete PubPost', async () => {
     expect.assertions(2);
-    const deleted = await broker.call('public.deleteById', {
+    const deleted: any = await broker.call('public.deleteById', {
       id: insertedPost.id
     });
     expect(deleted.id).toEqual(insertedPost.id);
@@ -138,14 +138,14 @@ describe('>> KnexDBMixin <<', () => {
     afterAll(() => service.clean());
 
     it('Should find all posts', async () => {
-      const foundPosts = await broker.call('public.find');
+      const foundPosts: any[] = await broker.call('public.find');
       createdPosts = [...foundPosts];
       expect(foundPosts.length).toBe(3);
     });
 
     it('Should find correct post', async () => {
       expect.assertions(2);
-      const foundPosts = await broker.call('public.find', {
+      const foundPosts: any[] = await broker.call('public.find', {
         field: 'title',
         operator: '=',
         value: createdPosts[0].title
@@ -156,7 +156,7 @@ describe('>> KnexDBMixin <<', () => {
     });
 
     it('Should find correct post by id', async () => {
-      const foundPosts = await broker.call('public.findById', {
+      const foundPosts: any[] = await broker.call('public.findById', {
         id: createdPosts[0].id
       });
 
@@ -165,7 +165,7 @@ describe('>> KnexDBMixin <<', () => {
 
     it('Should find correct post with custom operator', async () => {
       expect.assertions(3);
-      const foundPosts = await broker.call('public.find', {
+      const foundPosts: any[] = await broker.call('public.find', {
         field: 'id',
         operator: '>',
         value: createdPosts[0].id
@@ -177,13 +177,13 @@ describe('>> KnexDBMixin <<', () => {
     });
 
     it('Should find with custom db', async () => {
-      const foundPosts = await broker.call('public.findPostWithDb');
+      const foundPosts: any[] = await broker.call('public.findPostWithDb');
       createdPosts = [...foundPosts];
       expect(foundPosts.length).toBe(3);
     });
 
     it('Should find with custom db without schema', async () => {
-      const foundPosts = await broker.call(
+      const foundPosts: any[] = await broker.call(
         'public.findPostWithDbWithoutSchema'
       );
       createdPosts = [...foundPosts];
@@ -215,7 +215,7 @@ describe('>> KnexDBMixin with Cacher <<', () => {
         params: {
           key: 'string'
         },
-        handler(ctx: Context) {
+        handler(ctx: Context<{ key: string }>) {
           const { key } = ctx.params;
           return this.broker.cacher.get(key);
         }
@@ -241,8 +241,8 @@ describe('>> KnexDBMixin with Cacher <<', () => {
 
     it('Should find all posts', async () => {
       expect.assertions(2);
-      const foundPosts = await broker.call('public.find');
-      const fromCached = await broker.call('public.getCache', {
+      const foundPosts: any[] = await broker.call('public.find');
+      const fromCached: any[] = await broker.call('public.getCache', {
         key: 'public.find:undefined|undefined|undefined'
       });
       createdPosts = [...foundPosts];
@@ -252,12 +252,12 @@ describe('>> KnexDBMixin with Cacher <<', () => {
 
     it('Should find correct post', async () => {
       expect.assertions(3);
-      const foundPosts = await broker.call('public.find', {
+      const foundPosts: any[] = await broker.call('public.find', {
         field: 'title',
         operator: '=',
         value: createdPosts[0].title
       });
-      const fromCached = await broker.call('public.getCache', {
+      const fromCached: any[] = await broker.call('public.getCache', {
         key: `public.find:title|${createdPosts[0].title}|=`
       });
 
@@ -268,10 +268,10 @@ describe('>> KnexDBMixin with Cacher <<', () => {
 
     it('Should find correct post by id', async () => {
       expect.assertions(2);
-      const foundPosts = await broker.call('public.findById', {
+      const foundPosts: any[] = await broker.call('public.findById', {
         id: createdPosts[0].id
       });
-      const fromCached = await broker.call('public.getCache', {
+      const fromCached: any[] = await broker.call('public.getCache', {
         key: `public.findById:${createdPosts[0].id}`
       });
 
@@ -281,12 +281,12 @@ describe('>> KnexDBMixin with Cacher <<', () => {
 
     it('Should find correct post with custom operator', async () => {
       expect.assertions(4);
-      const foundPosts = await broker.call('public.find', {
+      const foundPosts: any[] = await broker.call('public.find', {
         field: 'id',
         operator: '>',
         value: createdPosts[0].id
       });
-      const fromCached = await broker.call('public.getCache', {
+      const fromCached: any[] = await broker.call('public.getCache', {
         key: `public.find:id|${createdPosts[0].id}|>`
       });
 

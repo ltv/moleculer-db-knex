@@ -10,7 +10,7 @@ export interface MoleculerKnexDbOptions {
   tenantField?: string;
   knex: {
     configs?: Config;
-    instance?: Knex
+    instance?: Knex;
   };
 }
 
@@ -22,9 +22,7 @@ const defaultOptions: MoleculerKnexDbOptions = {
   knex: null
 };
 
-export function KnexDbMixin(
-  options: MoleculerKnexDbOptions
-): ServiceSchema {
+export function KnexDbMixin(options: MoleculerKnexDbOptions): ServiceSchema {
   const opts: MoleculerKnexDbOptions = { ...defaultOptions, ...options };
   let knex: Knex;
   const { idField, tenantField } = opts;
@@ -43,7 +41,7 @@ export function KnexDbMixin(
         cache: {
           keys: ['where']
         },
-        handler(ctx: Context) {
+        handler(ctx: Context<{ where: any }>) {
           const { where = {} } = ctx.params;
           return this.find(where);
         }
@@ -58,9 +56,11 @@ export function KnexDbMixin(
         cache: {
           keys: [idField]
         },
-        async handler(ctx: Context) {
+        async handler(ctx: Context<{ [key: string]: any }>) {
           try {
-            const res = await this.find({ [this.settings.idField]: ctx.params[this.settings.idField] });
+            const res: any[] = await this.find({
+              [this.settings.idField]: ctx.params[this.settings.idField]
+            });
             return res && res.length ? res[0] : null;
           } catch (e) {
             this.logger.error(e);
@@ -75,7 +75,7 @@ export function KnexDbMixin(
             type: 'any'
           }
         },
-        handler(ctx: Context) {
+        handler(ctx: Context<{ entity: any }>) {
           const { entity } = ctx.params;
           return this.insert(entity).then(res =>
             this.entityChanged('inserted', res, ctx).then(() => res)
@@ -92,7 +92,7 @@ export function KnexDbMixin(
             type: 'any'
           }
         },
-        handler(ctx: Context) {
+        handler(ctx: Context<{ [key: string]: any; entity: any }>) {
           const { entity } = ctx.params;
           return this.update({
             field: this.settings.idField,
@@ -110,7 +110,7 @@ export function KnexDbMixin(
             type: 'any'
           }
         },
-        handler(ctx: Context) {
+        handler(ctx: Context<{ [key: string]: any; entity: any }>) {
           return this.delete({
             field: this.settings.idField,
             value: ctx.params[this.settings.idField]
@@ -164,8 +164,14 @@ export function KnexDbMixin(
         return knex;
       },
 
-      db(options?: { schema?: string; table: string, tenant?: number | string }): QueryBuilder {
-        const { schema = 'public', table, tenant = null } = options || { ...opts };
+      db(options?: {
+        schema?: string;
+        table: string;
+        tenant?: number | string;
+      }): QueryBuilder {
+        const { schema = 'public', table, tenant = null } = options || {
+          ...opts
+        };
         const db = this.knex()(table).withSchema(schema);
 
         // Check if configured tenant, will be use the tenant
