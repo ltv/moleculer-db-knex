@@ -1,5 +1,5 @@
 // tslint:disable: no-shadowed-variable
-import Knex, { Config, QueryBuilder } from 'knex';
+import knexFunc, { Knex } from 'knex';
 import capitalize from 'lodash.capitalize';
 import { Context, ServiceSchema } from 'moleculer';
 
@@ -9,7 +9,7 @@ export interface MoleculerKnexDbOptions {
   idField?: string;
   tenantField?: string;
   knex: {
-    configs?: Config;
+    configs?: Knex.Config;
     instance?: Knex;
   };
 }
@@ -155,7 +155,7 @@ export function KnexDbMixin(options: MoleculerKnexDbOptions): ServiceSchema {
 
       connect() {
         if (!opts.knex.instance) {
-          opts.knex.instance = Knex(opts.knex.configs);
+          opts.knex.instance = knexFunc(opts.knex.configs);
         }
         return opts.knex.instance;
       },
@@ -164,15 +164,17 @@ export function KnexDbMixin(options: MoleculerKnexDbOptions): ServiceSchema {
         return knex;
       },
 
-      db(options?: {
+      db(dbOpts?: {
         schema?: string;
         table: string;
         tenant?: number | string;
-      }): QueryBuilder {
-        const { schema = 'public', table, tenant = null } = options || {
+      }): Knex.QueryBuilder {
+        const { table, tenant = null } = dbOpts || {
           ...opts
         };
-        const db = this.knex()(table).withSchema(schema);
+
+        const mSchema = schema || dbOpts.schema || 'public';
+        const db = this.knex()(table).withSchema(mSchema);
 
         // Check if configured tenant, will be use the tenant
         if (tenant && this.settings.tenantField) {

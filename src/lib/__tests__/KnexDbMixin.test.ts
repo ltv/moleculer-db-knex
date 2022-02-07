@@ -1,8 +1,8 @@
+import { Knex } from 'knex';
+import { Context, ServiceBroker } from 'moleculer';
 import { KnexDbMixin } from '../KnexDbMixin';
-import { ServiceBroker, Context } from 'moleculer';
-import { Config, ConnectionConfig } from 'knex';
 
-const connection: ConnectionConfig = {
+const connection: Knex.ConnectionConfig = {
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
@@ -10,7 +10,7 @@ const connection: ConnectionConfig = {
   port: process.env.DB_PORT
 } as any;
 
-const configs: Config = {
+const configs: Knex.Config = {
   client: 'postgresql',
   connection,
   pool: {
@@ -102,15 +102,15 @@ describe('>> KnexDBMixin <<', () => {
 
   it('Should update PubPost correctly', async () => {
     expect.assertions(2);
-    const tobeUpdated = { title: 'New Title', content: 'New Content' };
+    const toBeUpdated = { title: 'New Title', content: 'New Content' };
     const updated: any = await broker.call('public.updateById', {
       id: insertedPost.id,
-      entity: tobeUpdated
+      entity: toBeUpdated
     });
 
     expect(updated).toEqual({
       id: insertedPost.id,
-      ...tobeUpdated
+      ...toBeUpdated
     });
     expect(entityUpdated).toBeCalledTimes(1);
   });
